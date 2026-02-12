@@ -80,14 +80,18 @@ git push -u origin main
 
 ### 3. Vercel にデプロイ
 
+⚠️ **重要:** DATABASE_URLは必ずSupabase Pooler接続を使用してください
+
 1. [Vercel](https://vercel.com) にサインアップ
 2. 「New Project」をクリック
 3. GitHubリポジトリを選択
 4. 環境変数を設定：
-   - `DATABASE_URL`: Supabase の接続文字列
+   - `DATABASE_URL`: `postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1`
    - `NEXTAUTH_URL`: デプロイ後のURL
    - `NEXTAUTH_SECRET`: ランダムな文字列（`openssl rand -base64 32` で生成）
 5. 「Deploy」をクリック
+
+📖 詳細は [DEPLOY.md](./DEPLOY.md) を参照
 
 ### 4. データベースをマイグレート
 
