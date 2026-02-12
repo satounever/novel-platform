@@ -10,11 +10,12 @@ const novelSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const novel = await prisma.novel.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -62,7 +63,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -74,8 +75,9 @@ export async function PATCH(
       )
     }
 
+    const { id } = await params
     const novel = await prisma.novel.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!novel) {
@@ -96,7 +98,7 @@ export async function PATCH(
     const { title, content } = novelSchema.parse(body)
 
     const updatedNovel = await prisma.novel.update({
-      where: { id: params.id },
+      where: { id },
       data: { title, content },
       include: {
         author: {
@@ -127,7 +129,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -139,8 +141,9 @@ export async function DELETE(
       )
     }
 
+    const { id } = await params
     const novel = await prisma.novel.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!novel) {
@@ -159,7 +162,7 @@ export async function DELETE(
     }
 
     await prisma.novel.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "削除しました" })

@@ -9,7 +9,7 @@ const commentSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -21,6 +21,7 @@ export async function POST(
       )
     }
 
+    const { id } = await params
     const body = await request.json()
     const { content } = commentSchema.parse(body)
 
@@ -28,7 +29,7 @@ export async function POST(
       data: {
         content,
         userId: (session.user as any).id,
-        novelId: params.id
+        novelId: id
       },
       include: {
         user: {

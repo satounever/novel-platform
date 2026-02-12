@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -16,6 +16,7 @@ export async function POST(
       )
     }
 
+    const { id } = await params
     const userId = (session.user as any).id
 
     // Check if already liked
@@ -23,7 +24,7 @@ export async function POST(
       where: {
         userId_novelId: {
           userId,
-          novelId: params.id
+          novelId: id
         }
       }
     })
@@ -38,7 +39,7 @@ export async function POST(
     const like = await prisma.like.create({
       data: {
         userId,
-        novelId: params.id
+        novelId: id
       }
     })
 
@@ -54,7 +55,7 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -66,12 +67,13 @@ export async function DELETE(
       )
     }
 
+    const { id } = await params
     const userId = (session.user as any).id
 
     await prisma.like.deleteMany({
       where: {
         userId,
-        novelId: params.id
+        novelId: id
       }
     })
 
@@ -87,7 +89,7 @@ export async function DELETE(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -96,13 +98,14 @@ export async function GET(
       return NextResponse.json({ liked: false })
     }
 
+    const { id } = await params
     const userId = (session.user as any).id
 
     const like = await prisma.like.findUnique({
       where: {
         userId_novelId: {
           userId,
-          novelId: params.id
+          novelId: id
         }
       }
     })
