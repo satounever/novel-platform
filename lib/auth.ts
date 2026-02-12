@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs"
 import { z } from "zod"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -47,15 +47,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.role = (user as any).role
+        token.id = user.id as string
+        token.role = user.role as string
       }
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id
-        (session.user as any).role = token.role
+      if (session.user && token.id && token.role) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
       }
       return session
     }
